@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบปฏิทินกิจกรรม มจร กาฬสินธุ์</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    :root {
+      --primary:#8F1D54;
+      --primary-2:#C52F72;
+      --purple:#6B2C91;
+      --gold:#D5A62E;
+      --gold-soft:#F7E6A7;
+      --ivory:#FFFDF8;
+      --ink:#3E3540;
+      --muted:#746B75;
+      --line:#E9DFE7;
+      --success:#21836A;
+      --blue:#245A9C;
+      --danger:#B4233E;
+      --shadow:0 20px 55px rgba(71,24,57,.18);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:'Sarabun',sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 12% 10%,rgba(213,166,46,.22),transparent 22%),
+        radial-gradient(circle at 88% 15%,rgba(197,47,114,.25),transparent 25%),
+        linear-gradient(135deg,#54133e 0%,#8f1d54 36%,#6b2c91 70%,#c52f72 100%);
+      min-height:100vh;
+    }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    .hidden{display:none!important}
+    .app-shell{min-height:100vh;display:flex;flex-direction:column}
+    .topbar{
+      position:sticky;top:0;z-index:50;
+      background:rgba(255,253,248,.96);
+      border-bottom:1px solid rgba(143,29,84,.12);
+      backdrop-filter:blur(16px);
+      box-shadow:0 8px 28px rgba(60,19,49,.10)
+    }
+    .topbar-inner{max-width:1560px;margin:auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:15px;min-width:0}
+    .brand-logo{width:64px;height:64px;object-fit:contain;border-radius:50%;background:white;padding:4px;border:2px solid rgba(213,166,46,.55);box-shadow:0 8px 20px rgba(143,29,84,.16)}
+    .brand-copy{min-width:0}
+    .brand-title{margin:0;font-size:24px;line-height:1.15;font-weight:700;background:linear-gradient(90deg,var(--primary),var(--primary-2),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .brand-subtitle{margin:4px 0 0;color:var(--muted);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:980px}
+    .sync-pill{display:flex;align-items:center;gap:8px;border:1px solid rgba(143,29,84,.15);background:white;color:var(--primary);padding:9px 14px;border-radius:999px;box-shadow:0 7px 18px rgba(68,24,54,.08);font-weight:600;font-size:13px}
+    .main{width:100%;max-width:1560px;margin:auto;padding:28px 24px 40px;flex:1}
+    .panel{background:rgba(255,253,248,.97);border:1px solid rgba(255,255,255,.65);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
+    .tabs{display:flex;align-items:center;gap:4px;padding:0 22px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#fffafc,#fffdf8,#faf6ff);overflow:auto}
+    .tab-btn{border:0;background:transparent;padding:18px 18px;color:#756d78;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:8px;border-bottom:3px solid transparent;transition:.2s}
+    .tab-btn:hover{color:var(--primary);background:rgba(143,29,84,.04)}
+    .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary-2)}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 22px;background:linear-gradient(90deg,rgba(197,47,114,.08),rgba(213,166,46,.08),rgba(107,44,145,.08));border-bottom:1px solid rgba(143,29,84,.08);flex-wrap:wrap}
+    .month-group{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+    .month-title{font-size:29px;font-weight:700;margin:0;background:linear-gradient(90deg,var(--primary),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .nav-group{display:flex;background:white;border:1px solid var(--line);border-radius:14px;padding:4px;box-shadow:0 6px 16px rgba(65,24,51,.08)}
+    .icon-btn,.text-btn{border:0;background:transparent;color:var(--ink);height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:7px;transition:.2s}
+    .icon-btn{width:38px}.text-btn{padding:0 14px;font-weight:600}
+    .icon-btn:hover,.text-btn:hover{background:linear-gradient(135deg,var(--primary),var(--purple));color:white}
+    .toolbar-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .btn{border:0;border-radius:12px;padding:10px 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;transition:.2s;box-shadow:0 7px 18px rgba(58,22,46,.12)}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(58,22,46,.16)}
+    .btn-primary{color:white;background:linear-gradient(135deg,var(--primary-2),var(--purple))}
+    .btn-gold{color:#4b3920;background:linear-gradient(135deg,#f7df82,var(--gold))}
+    .btn-soft{color:var(--primary);background:#fff;border:1px solid rgba(143,29,84,.18)}
+    .btn-danger{color:white;background:linear-gradient(135deg,#c93656,#9e1738)}
+    .btn-success{color:white;background:linear-gradient(135deg,#2b9d7f,#176a58)}
+    .btn-purple{color:white;background:linear-gradient(135deg,#8343a9,var(--purple))}
+    .btn-sm{padding:7px 10px;border-radius:9px;font-size:13px;box-shadow:none}
+    .filters{padding:12px 22px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--line);background:#fff}
+    .filter-chip{border:1px solid var(--line);background:#fff;color:#625968;border-radius:999px;padding:8px 12px;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;transition:.2s}
+    .filter-chip .dot{width:9px;height:9px;border-radius:50%}
+    .filter-chip.active{border-color:rgba(143,29,84,.25);color:var(--primary);background:#fff5f9;box-shadow:0 5px 12px rgba(143,29,84,.08)}
+    .calendar-scroll{overflow:auto;background:#e9e3e9}
+    .calendar-wrap{min-width:1050px;background:white}
+    .week-header{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--line)}
+    .week-day{padding:14px 8px;text-align:center;font-weight:700;color:#635a66;background:#fff}
+    .week-day.sunday{color:#b11f45;background:#fff7f9}.week-day.saturday{color:#30438c;background:#f8f9ff}
+    .wd-short{display:none}
+    .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#e5dde5}
+    .day-cell{position:relative;min-height:154px;background:linear-gradient(145deg,#fff,#fffdfb);padding:10px;display:flex;flex-direction:column;overflow:hidden;transition:.2s}
+    .day-cell:hover{z-index:2;box-shadow:inset 0 0 0 2px rgba(197,47,114,.16),0 10px 28px rgba(69,24,55,.12)}
+    .day-cell.empty{background:#f4f1f5}
+    .day-cell.today{background:linear-gradient(145deg,#fff6fb,#faf4ff);box-shadow:inset 0 0 0 2px rgba(197,47,114,.35)}
+    .day-cell.holiday{background:linear-gradient(145deg,#fff2f6,#fff9fb)}
+    .day-cell.buddhist{background:linear-gradient(145deg,#fffaf0,#fffdf7)}
+    .day-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-height:34px}
+    .day-number{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#edf0f5;color:#34445b;font-weight:700;font-size:15px}
+    .day-cell.today .day-number{color:white;background:linear-gradient(135deg,var(--primary-2),var(--purple));box-shadow:0 7px 18px rgba(143,29,84,.24)}
+    .day-cell.sunday .day-number{color:#a51f42}.day-cell.saturday .day-number{color:#30438c}
+    .day-icons{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .mini-icon{width:26px;height:26px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;background:#fff;border:1px solid rgba(143,29,84,.12)}
+    .mini-icon.buddha{padding:0;background:transparent;border:0;width:24px;height:24px;box-shadow:none}
+    .mini-icon.holiday{background:#ffe8ef;color:#b4233e}.mini-icon.mcu{background:#f6ecff;color:#6b2c91}
+    .configured-icon{overflow:hidden;flex:0 0 auto}
+    .configured-icon img{width:82%;height:82%;object-fit:contain;display:block}
+    .configured-icon svg{width:58%;height:58%;stroke-width:2.2}
+    .configured-icon.emoji-icon{font-size:15px;line-height:1}
+    .icon-help{font-size:11px;color:var(--muted);margin-top:5px}
+    .moon-phase{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid rgba(62,53,64,.18);box-shadow:0 3px 10px rgba(62,53,64,.10)}
+    .moon-phase.waxing-half{background:linear-gradient(90deg,#f3cf57 50%,#fff4c6 50%);border-color:#d5a62e}
+    .moon-phase.waxing-full{background:#f3cf57;border-color:#d5a62e;box-shadow:0 0 0 2px rgba(213,166,46,.12),0 3px 10px rgba(62,53,64,.10)}
+    .moon-phase.waning-half{background:linear-gradient(90deg,#2f2b34 50%,#cfc6b2 50%);border-color:#2f2b34}
+    .moon-phase.waning-full{background:#2f2b34;border-color:#2f2b34}
+    .events-list{display:flex;flex-direction:column;gap:5px;margin-top:6px;max-height:80px;overflow:auto;padding-right:2px}
+    .event-card{border:0;text-align:left;color:white;border-radius:8px;padding:7px 8px;font-size:11.5px;line-height:1.25;box-shadow:0 5px 12px rgba(71,24,57,.15);width:100%;transition:.2s}
+    .event-card:hover{transform:translateY(-1px);filter:brightness(1.03)}
+    .event-card.done{opacity:.72}.event-card.cancelled{text-decoration:line-through;opacity:.58}
+    .event-title{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .event-meta{opacity:.88;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
+    .central-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+    .central-tag{font-size:10px;line-height:1.15;padding:4px 6px;border-radius:7px;font-weight:600;border:1px solid rgba(143,29,84,.12);background:#fff;color:var(--primary)}
+    .lunar{margin-top:auto;padding-top:6px;font-size:10.5px;color:#5f5662;text-align:center;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .notes-section{padding:18px 22px 22px;background:linear-gradient(135deg,#fffaf1,#fff7fb,#f8f2ff);border-top:1px solid var(--line)}
+    .section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .section-heading h3{margin:0;font-size:19px;color:var(--primary);display:flex;align-items:center;gap:9px}
+    .notes-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+    .note-card{display:flex;gap:11px;align-items:flex-start;background:rgba(255,255,255,.8);border:1px solid rgba(143,29,84,.12);border-radius:14px;padding:12px 14px;box-shadow:0 6px 16px rgba(70,23,55,.06)}
+    .note-date{min-width:48px;text-align:center;background:linear-gradient(135deg,var(--primary),var(--purple));color:white;border-radius:11px;padding:7px 5px;font-weight:700}
+    .note-title{font-weight:700;color:var(--ink)}.note-sub{font-size:12px;color:var(--muted);margin-top:3px}
+    .content-view{min-height:650px}
+    .content-pad{padding:24px}
+    .report-head{text-align:center;margin-bottom:20px}.report-head h2{margin:0;color:var(--primary);font-size:25px}.report-head p{margin:5px 0;color:var(--muted)}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:white;box-shadow:0 10px 28px rgba(64,22,51,.08)}
+    table{border-collapse:collapse;width:100%;min-width:900px}
+    th,td{padding:12px 13px;border-bottom:1px solid #eee6ed;text-align:left;vertical-align:top}
+    th{background:linear-gradient(135deg,var(--primary),var(--purple));color:white;font-weight:700;position:sticky;top:0;z-index:2}
+    tr:hover td{background:#fff8fb}
+    .status-badge,.type-badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:700}
+    .status-badge{background:#f0ecf4;color:var(--purple)}
+    .admin-header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+    .admin-header h2{margin:0;color:var(--primary)}
+    .admin-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+    .admin-tab{border:1px solid var(--line);background:white;color:#665c68;border-radius:11px;padding:9px 13px;font-weight:600}
+    .admin-tab.active{background:linear-gradient(135deg,var(--primary),var(--purple));color:white;border-color:transparent}
+    .admin-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .empty-state{text-align:center;padding:50px 20px;color:#8c838e}.empty-state svg{margin-bottom:10px}
+    .footer{padding:22px 24px;text-align:center;color:white;font-size:13px;background:rgba(45,12,35,.42);border-top:1px solid rgba(255,255,255,.12)}
+    .footer strong{color:#ffe49a}
+    .modal{position:fixed;inset:0;z-index:100;background:rgba(35,10,29,.62);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:18px}
+    .modal-card{width:min(760px,100%);max-height:92vh;overflow:auto;background:var(--ivory);border-radius:22px;box-shadow:0 28px 80px rgba(25,8,21,.35);border:1px solid rgba(255,255,255,.6)}
+    .modal-card.small{width:min(520px,100%)}
+    .modal-head{padding:17px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,var(--primary),var(--purple));color:white;position:sticky;top:0;z-index:3}
+    .modal-head.gold{background:linear-gradient(135deg,#b88415,var(--gold));color:#fff}
+    .modal-head h3{margin:0;font-size:20px}.modal-close{border:0;background:rgba(255,255,255,.16);color:white;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+    .modal-body{padding:20px}.modal-footer{padding:14px 20px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--line);background:#fffafc;position:sticky;bottom:0}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .form-group{display:flex;flex-direction:column;gap:6px}.form-group.full{grid-column:1/-1}
+    .form-label{font-weight:600;color:#554b58;font-size:14px}.required{color:#c31f47}
+    .form-control{width:100%;border:1px solid #d9cfd8;border-radius:11px;padding:10px 12px;background:white;color:var(--ink);outline:none;transition:.2s}
+    .form-control:focus{border-color:var(--primary-2);box-shadow:0 0 0 4px rgba(197,47,114,.10)}
+    textarea.form-control{min-height:92px;resize:vertical}
+    .check-row{display:flex;align-items:center;gap:9px;padding-top:28px}.check-row input{width:18px;height:18px;accent-color:var(--primary)}
+    .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.detail-item{background:white;border:1px solid var(--line);border-radius:13px;padding:12px}.detail-item.full{grid-column:1/-1}.detail-key{font-size:12px;color:var(--muted);margin-bottom:4px}.detail-value{font-weight:600;white-space:pre-wrap}
+    .loader-overlay{position:fixed;inset:0;z-index:200;background:rgba(255,253,248,.88);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center}
+    .loader-box{text-align:center;color:var(--primary);font-weight:700}.spinner{width:48px;height:48px;border-radius:50%;border:5px solid rgba(143,29,84,.16);border-top-color:var(--primary);animation:spin .8s linear infinite;margin:0 auto 12px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .toast-dot{width:8px;height:8px;border-radius:50%;background:var(--success)}
+    .color-row{display:flex;gap:8px;flex-wrap:wrap}.color-choice{width:32px;height:32px;border-radius:10px;border:3px solid white;box-shadow:0 0 0 1px #d8cfd7;cursor:pointer}.color-choice.selected{box-shadow:0 0 0 3px var(--gold)}
+    @media(max-width:800px){
+      .topbar-inner{padding:10px 14px}.brand-logo{width:52px;height:52px}.brand-title{font-size:19px}.brand-subtitle{font-size:12px;max-width:68vw}.sync-pill{display:none}
+      .main{padding:14px 10px 28px}.panel{border-radius:18px}.tabs{padding:0 8px}.tab-btn{padding:15px 12px}.toolbar{padding:13px 12px}.month-title{font-size:23px}.filters{padding:10px 12px}.content-pad{padding:14px}.notes-section{padding:14px 12px 18px}.form-grid,.detail-grid{grid-template-columns:1fr}.check-row{padding-top:0}.modal{padding:8px}.modal-card{border-radius:17px}.admin-header{align-items:flex-start}
+      .calendar-scroll{overflow-x:visible}.calendar-wrap{min-width:0;width:100%}.week-day{padding:10px 2px;font-size:11px}.wd-full{display:none}.wd-short{display:inline}
+      .day-cell{min-height:104px;padding:5px}.day-top{min-height:28px;gap:4px}.day-number{width:26px;height:26px;font-size:13px}.day-icons{gap:3px}.mini-icon{width:20px;height:20px;border-radius:50%;font-size:11px}.mini-icon.buddha{width:20px;height:20px}.moon-phase{width:18px;height:18px;border-width:1.2px}
+      .events-list{margin-top:4px;gap:3px;max-height:none}.event-card{padding:4px 5px;font-size:9px;border-radius:6px;line-height:1.15}.event-meta{display:none}.event-title{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+      .central-tags{gap:3px;margin-top:4px}.central-tag{font-size:8.5px;padding:2px 4px;border-radius:5px}.lunar{padding-top:4px;font-size:8px;line-height:1.15;white-space:normal;overflow:visible;text-overflow:clip}
+    }
+    @media print{
+      body{background:white}.topbar,.tabs,.toolbar,.filters,.footer,.no-print,#calendar-view,#admin-view{display:none!important}.main{padding:0;max-width:none}.panel{box-shadow:none;border:0;border-radius:0}.content-pad{padding:0}.report-head{margin-top:0}th{background:#8F1D54!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:white!important}.table-wrap{box-shadow:none;border-radius:0}.content-view{min-height:auto}
+    }
+
+    .import-panel{background:linear-gradient(135deg,#fffaf1,#fff7fb,#f7f1ff);border:1px solid rgba(143,29,84,.13);border-radius:18px;padding:18px;margin-bottom:18px;box-shadow:0 8px 24px rgba(71,24,57,.07)}
+    .import-help{display:flex;gap:12px;align-items:flex-start;background:white;border:1px solid rgba(213,166,46,.35);border-left:5px solid var(--gold);border-radius:14px;padding:14px 16px;margin-bottom:16px;color:#5c4d45}
+    .import-help i{color:var(--gold);min-width:22px}
+    .source-buttons{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 16px}
+    .source-preset{border:1px solid var(--line);background:white;color:var(--ink);border-radius:12px;padding:10px 13px;display:flex;align-items:center;gap:8px;font-weight:600;transition:.2s}
+    .source-preset:hover,.source-preset.active{color:white;border-color:transparent;background:linear-gradient(135deg,var(--primary),var(--purple));box-shadow:0 8px 18px rgba(107,44,145,.18)}
+    .compact-checks{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:white;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+    .compact-checks label{display:flex;align-items:center;gap:7px;font-weight:600;color:#5e5561}.compact-checks input{width:18px;height:18px;accent-color:var(--primary)}
+    .import-stats{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}
+    .import-stat{flex:1 1 150px;background:white;border:1px solid var(--line);border-radius:15px;padding:14px;box-shadow:0 6px 16px rgba(71,24,57,.06)}
+    .import-stat .number{font-size:28px;font-weight:700;color:var(--primary);line-height:1}.import-stat .label{font-size:12px;color:var(--muted);margin-top:7px}
+    .preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:18px 0 10px}
+    .preview-head h3{margin:0;color:var(--primary);font-size:19px;display:flex;align-items:center;gap:8px}
+    .preview-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .import-source-meta{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;color:var(--muted);font-size:13px;word-break:break-word}
+    .preview-check{width:18px;height:18px;accent-color:var(--primary)}
+    .duplicate-new{color:var(--success);font-weight:700}.duplicate-old{color:#9a6510;font-weight:700}.duplicate-maybe{color:var(--danger);font-weight:700}
+    .history-status{display:inline-flex;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700;background:#f1ecf5;color:var(--purple)}
+    .history-status.rolled{background:#eee;color:#777}
+    .import-file-note{font-size:12px;color:var(--muted);margin-top:5px}
+    .import-divider{height:1px;background:var(--line);margin:20px 0}
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar no-print">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img id="brand-logo" class="brand-logo" src="https://img2.pic.in.th/-a47d4369f36e7693.png" alt="ตรามหาวิทยาลัย">
+        <div class="brand-copy">
+          <h1 id="brand-title" class="brand-title">ระบบปฏิทินกิจกรรม</h1>
+          <p id="brand-subtitle" class="brand-subtitle">หน่วยวิทยบริการ วิทยาลัยสงฆ์ขอนแก่น จังหวัดกาฬสินธุ์</p>
+        </div>
+      </div>
+      <div class="sync-pill"><span class="toast-dot"></span><span id="sync-text">กำลังเชื่อมต่อ...</span></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="panel">
+      <nav class="tabs no-print">
+        <button id="tab-calendar" class="tab-btn active" onclick="switchView('calendar')"><i data-lucide="calendar-days"></i>มุมมองปฏิทิน</button>
+        <button id="tab-report" class="tab-btn" onclick="switchView('report')"><i data-lucide="file-text"></i>รายงานประจำเดือน</button>
+        <button id="tab-admin" class="tab-btn" onclick="switchView('admin')"><i data-lucide="shield-check"></i>ผู้ดูแลระบบ</button>
+      </nav>
+
+      <div class="toolbar no-print">
+        <div class="month-group">
+          <h2 id="month-title" class="month-title"></h2>
+          <div class="nav-group">
+            <button class="icon-btn" onclick="changeMonth(-1)" title="เดือนก่อน"><i data-lucide="chevron-left"></i></button>
+            <button class="text-btn" onclick="goToday()">วันนี้</button>
+            <button class="icon-btn" onclick="changeMonth(1)" title="เดือนถัดไป"><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+        <div class="toolbar-actions">
+          <button id="print-btn" class="btn btn-soft hidden" onclick="window.print()"><i data-lucide="printer"></i>พิมพ์รายงาน</button>
+          <button class="btn btn-gold" onclick="refreshAll()"><i data-lucide="refresh-cw"></i>รีเฟรช</button>
+        </div>
+      </div>
+
+      <div id="calendar-filters" class="filters no-print">
+        <button class="filter-chip active" data-filter="activities" onclick="toggleFilter(this)"><span class="dot" style="background:#C52F72"></span>กิจกรรม</button>
+        <button class="filter-chip active" data-filter="lunar" onclick="toggleFilter(this)"><span class="dot" style="background:#746B75"></span>จันทรคติ</button>
+        <button class="filter-chip active" data-filter="buddhist" onclick="toggleFilter(this)"><span class="dot" style="background:#D5A62E"></span>วันพระ</button>
+        <button class="filter-chip active" data-filter="holiday" onclick="toggleFilter(this)"><span class="dot" style="background:#B4233E"></span>วันหยุด</button>
+        <button class="filter-chip active" data-filter="central" onclick="toggleFilter(this)"><span class="dot" style="background:#6B2C91"></span>วันสำคัญ/ส่วนกลาง มจร.</button>
+      </div>
+
+      <section id="calendar-view" class="content-view">
+        <div class="calendar-scroll">
+          <div class="calendar-wrap">
+            <div class="week-header">
+              <div class="week-day sunday"><span class="wd-full">อาทิตย์</span><span class="wd-short">อา</span></div><div class="week-day"><span class="wd-full">จันทร์</span><span class="wd-short">จ</span></div><div class="week-day"><span class="wd-full">อังคาร</span><span class="wd-short">อ</span></div><div class="week-day"><span class="wd-full">พุธ</span><span class="wd-short">พ</span></div><div class="week-day"><span class="wd-full">พฤหัสบดี</span><span class="wd-short">พฤ</span></div><div class="week-day"><span class="wd-full">ศุกร์</span><span class="wd-short">ศ</span></div><div class="week-day saturday"><span class="wd-full">เสาร์</span><span class="wd-short">ส</span></div>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+          </div>
+        </div>
+        <div class="notes-section">
+          <div class="section-heading"><h3><i data-lucide="sparkles"></i>วันสำคัญประจำเดือน</h3><span id="notes-count" class="status-badge"></span></div>
+          <div id="monthly-notes" class="notes-list"></div>
+        </div>
+      </section>
+
+      <section id="report-view" class="content-view hidden">
+        <div class="content-pad">
+          <div class="report-head">
+            <h2>รายงานปฏิทินกิจกรรม</h2>
+            <p id="report-period"></p>
+            <p id="report-org"></p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>วัน/เดือน/ปี</th><th>กิจกรรม</th><th>ประเภท</th><th>ผู้รับผิดชอบ</th><th>ผู้เกี่ยวข้อง</th><th>สถานที่</th><th>สถานะ</th></tr></thead>
+              <tbody id="report-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="admin-view" class="content-view hidden">
+        <div class="content-pad">
+          <div class="admin-header">
+            <div><h2>ศูนย์จัดการระบบ</h2><div style="color:var(--muted);font-size:13px;margin-top:4px">จัดการกิจกรรม ปฏิทินกลาง นำเข้าข้อมูล MyHora การตั้งค่า และบันทึกการใช้งาน</div></div>
+            <div class="admin-actions">
+              <button class="btn btn-soft" onclick="openPasswordModal()"><i data-lucide="key-round"></i>เปลี่ยนรหัสผ่าน</button>
+              <button class="btn btn-danger" onclick="adminLogout()"><i data-lucide="log-out"></i>ออกจากระบบ</button>
+            </div>
+          </div>
+          <div class="admin-tabs">
+            <button id="admin-tab-activities" class="admin-tab active" onclick="switchAdminTab('activities')">กิจกรรม</button>
+            <button id="admin-tab-central" class="admin-tab" onclick="switchAdminTab('central')">ปฏิทินกลาง</button>
+            <button id="admin-tab-import" class="admin-tab" onclick="switchAdminTab('import')">นำเข้าปฏิทิน</button>
+            <button id="admin-tab-settings" class="admin-tab" onclick="switchAdminTab('settings')">ตั้งค่าระบบ</button>
+            <button id="admin-tab-logs" class="admin-tab" onclick="switchAdminTab('logs')">บันทึกระบบ</button>
+          </div>
+
+          <div id="admin-activities">
+            <div class="admin-header"><h2 style="font-size:19px">รายการกิจกรรม</h2><button class="btn btn-primary" onclick="openActivityForm()"><i data-lucide="plus"></i>เพิ่มกิจกรรม</button></div>
+            <div class="table-wrap"><table><thead><tr><th>วันที่</th><th>กิจกรรม</th><th>ประเภท</th><th>ผู้รับผิดชอบ</th><th>สถานะ</th><th style="width:150px">จัดการ</th></tr></thead><tbody id="admin-activity-body"></tbody></table></div>
+          </div>
+
+          <div id="admin-central" class="hidden">
+            <div class="admin-header"><h2 style="font-size:19px">ข้อมูลปฏิทินกลาง</h2><button class="btn btn-purple" onclick="openCentralForm()"><i data-lucide="plus"></i>เพิ่มข้อมูลปฏิทินกลาง</button></div>
+            <div class="table-wrap"><table><thead><tr><th>วันที่</th><th>จันทรคติ</th><th>ประเภท</th><th>ชื่อวัน/กิจกรรม</th><th>ไอคอน</th><th>วันพระ</th><th>วันหยุด</th><th style="width:140px">จัดการ</th></tr></thead><tbody id="admin-central-body"></tbody></table></div>
+          </div>
+
+          <div id="admin-import" class="hidden">
+            <div class="admin-header">
+              <div><h2 style="font-size:19px">นำเข้าปฏิทินจาก MyHora</h2><div style="color:var(--muted);font-size:13px;margin-top:4px">รองรับไฟล์ ICS และการซิงก์ผ่าน URL พร้อมตรวจข้อมูลซ้ำก่อนบันทึก</div></div>
+              <button class="btn btn-soft" onclick="loadImportHistory()"><i data-lucide="history"></i>โหลดประวัติใหม่</button>
+            </div>
+
+            <div class="import-panel">
+              <div class="import-help"><i data-lucide="shield-check"></i><div><strong>นำเข้าอย่างปลอดภัย</strong><br>ระบบจะแสดงตัวอย่างก่อนบันทึก ตรวจ UID และวันที่–ประเภท–ชื่อวัน เพื่อป้องกันข้อมูลซ้ำ โดยไม่กระทบกิจกรรมของหน่วยงาน</div></div>
+              <div class="source-buttons">
+                <button id="preset-buddhist" class="source-preset active" onclick="setImportSource('buddhist')"><i data-lucide="moon-star"></i>วันพระ</button>
+                <button id="preset-holiday" class="source-preset" onclick="setImportSource('holiday')"><i data-lucide="flag"></i>วันหยุดราชการ</button>
+                <button id="preset-lunar" class="source-preset" onclick="setImportSource('lunar')"><i data-lucide="calendar-range"></i>จันทรคติทุกวัน</button>
+              </div>
+              <div class="form-grid">
+                <div class="form-group"><label class="form-label">ประเภทข้อมูล</label><select id="import-source-type" class="form-control" onchange="applyImportPreset()"><option value="buddhist">ปฏิทินวันพระ</option><option value="holiday">ปฏิทินวันหยุด</option><option value="lunar">ปฏิทินจันทรคติไทย</option><option value="auto">ตรวจอัตโนมัติ</option></select></div>
+                <div class="form-group"><label class="form-label">ปี พ.ศ.</label><input id="import-year" type="number" min="2500" max="2700" class="form-control" value="2569"></div>
+                <div class="form-group"><label class="form-label">วิธีนำเข้า</label><select id="import-method" class="form-control" onchange="toggleImportMethod()"><option value="url">ซิงก์จาก URL</option><option value="file">อัปโหลดไฟล์ ICS</option></select></div>
+                <div class="form-group"><label class="form-label">เมื่อพบข้อมูลซ้ำ</label><select id="import-strategy" class="form-control"><option value="skip">ข้ามรายการเดิม</option><option value="update">อัปเดตรายการจาก MyHora</option></select></div>
+                <div id="import-url-group" class="form-group full"><label class="form-label">URL ไฟล์ ICS จาก MyHora</label><input id="import-url" class="form-control" placeholder="https://myhora.com/calendar/ical/..."><div class="import-file-note">อนุญาตเฉพาะ URL แบบ https:// จาก myhora.com</div></div>
+                <div id="import-file-group" class="form-group full hidden"><label class="form-label">เลือกไฟล์ ICS</label><input id="import-file" type="file" accept=".ics,.ical,.ifb,.icalendar,.txt,text/calendar" class="form-control"><div class="import-file-note">ขนาดไม่เกิน 5 MB รองรับ .ics .ical .ifb .icalendar และ .txt</div></div>
+                <div class="form-group full"><div class="compact-checks"><label><input id="import-convert-digits" type="checkbox" checked> แปลงเลขไทยเป็นเลขอารบิก</label><label><input id="import-mark-holiday" type="checkbox"> ทำเครื่องหมายเป็นวันหยุด</label></div></div>
+              </div>
+              <div style="display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px"><button class="btn btn-soft" onclick="resetImportPreview()"><i data-lucide="rotate-ccw"></i>ล้างตัวอย่าง</button><button id="analyze-import-btn" class="btn btn-gold" onclick="analyzeIcsImport()"><i data-lucide="scan-search"></i>ตรวจสอบข้อมูล</button></div>
+            </div>
+
+            <div id="import-preview" class="hidden">
+              <div class="preview-head"><h3><i data-lucide="list-checks"></i>ตัวอย่างก่อนนำเข้า</h3><div class="preview-actions"><button class="btn btn-soft btn-sm" onclick="toggleAllImportItems(true)">เลือกทั้งหมด</button><button class="btn btn-soft btn-sm" onclick="toggleAllImportItems(false)">ยกเลิกทั้งหมด</button><button id="commit-import-btn" class="btn btn-primary" onclick="commitImportPreview()"><i data-lucide="database-zap"></i>ยืนยันนำเข้า</button></div></div>
+              <div id="import-source-meta" class="import-source-meta"></div>
+              <div id="import-stats" class="import-stats"></div>
+              <div class="table-wrap"><table><thead><tr><th style="width:48px"><input id="import-select-all" class="preview-check" type="checkbox" onchange="toggleAllImportItems(this.checked)"></th><th>วันที่</th><th>จันทรคติ</th><th>ประเภท</th><th>ชื่อวัน/กิจกรรม</th><th>สถานะตรวจสอบ</th></tr></thead><tbody id="import-preview-body"></tbody></table></div>
+            </div>
+
+            <div class="import-divider"></div>
+            <div class="preview-head"><h3><i data-lucide="history"></i>ประวัติการนำเข้า</h3><span style="font-size:12px;color:var(--muted)">ย้อนกลับได้เป็นรายชุดนำเข้า</span></div>
+            <div class="table-wrap"><table><thead><tr><th>วันที่เวลา</th><th>รหัสชุด</th><th>ประเภท</th><th>ปี</th><th>เพิ่ม</th><th>อัปเดต</th><th>ข้าม</th><th>สถานะ</th><th style="width:120px">จัดการ</th></tr></thead><tbody id="import-history-body"></tbody></table></div>
+          </div>
+
+          <div id="admin-settings" class="hidden">
+            <div class="admin-header"><h2 style="font-size:19px">ตั้งค่าระบบและหน่วยงาน</h2><button class="btn btn-primary" onclick="saveSettingsFromPage()"><i data-lucide="save"></i>บันทึกการตั้งค่า</button></div>
+            <div class="form-grid" id="settings-form"></div>
+          </div>
+
+          <div id="admin-logs" class="hidden">
+            <div class="admin-header"><h2 style="font-size:19px">บันทึกการใช้งานล่าสุด</h2><button class="btn btn-soft" onclick="loadLogs()"><i data-lucide="refresh-cw"></i>โหลดใหม่</button></div>
+            <div class="table-wrap"><table><thead><tr><th>วันที่เวลา</th><th>ผู้ใช้งาน</th><th>การทำรายการ</th><th>รายละเอียด</th><th>รหัสอ้างอิง</th><th>แหล่งที่มา</th></tr></thead><tbody id="logs-body"></tbody></table></div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer no-print"><strong id="footer-system">ระบบปฏิทินกิจกรรม</strong> · <span id="footer-org">หน่วยวิทยบริการ วิทยาลัยสงฆ์ขอนแก่น จังหวัดกาฬสินธุ์</span><br>ผู้พัฒนาระบบ: <span id="footer-developer">พระมหาธงชัย วิลาสินี นักวิชาการศึกษา</span><br><span id="client-version" style="opacity:.65;font-size:11px"></span></footer>
+</div>
+
+<div id="loader" class="loader-overlay"><div class="loader-box"><div class="spinner"></div><div>กำลังเชื่อมต่อระบบปฏิทินกิจกรรม...</div></div></div>
+<script>
+  // Failsafe: หน้าเว็บต้องไม่ถูก Loader บังตลอด แม้เบราว์เซอร์ภายในแอปจะปิดกั้น Storage/CDN
+  window.setTimeout(function(){
+    var loader = document.getElementById('loader');
+    if (loader) loader.classList.add('hidden');
+  }, 6000);
+</script>
+
+<!-- Activity detail modal -->
+<div id="detail-modal" class="modal hidden" onclick="backdropClose(event,'detail-modal')">
+  <div class="modal-card small">
+    <div class="modal-head"><h3 id="detail-title">รายละเอียดกิจกรรม</h3><button class="modal-close" onclick="closeModal('detail-modal')"><i data-lucide="x"></i></button></div>
+    <div class="modal-body"><div id="detail-content" class="detail-grid"></div></div>
+    <div class="modal-footer"><button class="btn btn-soft" onclick="closeModal('detail-modal')">ปิด</button></div>
+  </div>
+</div>
+
+<!-- Activity form -->
+<div id="activity-modal" class="modal hidden" onclick="backdropClose(event,'activity-modal')">
+  <div class="modal-card">
+    <div class="modal-head"><h3 id="activity-modal-title">เพิ่มกิจกรรม</h3><button class="modal-close" onclick="closeModal('activity-modal')"><i data-lucide="x"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="activity-mode" value="add"><input type="hidden" id="activity-id"><input type="hidden" id="activity-row-number">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">วันที่เริ่ม <span class="required">*</span></label><input id="activity-start" type="date" class="form-control"></div>
+        <div class="form-group"><label class="form-label">วันที่สิ้นสุด</label><input id="activity-end" type="date" class="form-control"></div>
+        <div class="form-group full"><label class="form-label">ชื่อกิจกรรม <span class="required">*</span></label><input id="activity-title" class="form-control" maxlength="300"></div>
+        <div class="form-group"><label class="form-label">ประเภทกิจกรรม</label><select id="activity-type" class="form-control"></select></div>
+        <div class="form-group"><label class="form-label">สถานะ</label><select id="activity-status" class="form-control"></select></div>
+        <div class="form-group"><label class="form-label">กลุ่มงาน/ผู้รับผิดชอบ</label><input id="activity-owner" class="form-control"></div>
+        <div class="form-group"><label class="form-label">ผู้เกี่ยวข้อง</label><input id="activity-related" class="form-control"></div>
+        <div class="form-group full"><label class="form-label">สถานที่</label><input id="activity-location" class="form-control"></div>
+        <div class="form-group full"><label class="form-label">รายละเอียด</label><textarea id="activity-description" class="form-control"></textarea></div>
+        <div class="form-group"><label class="form-label">ลิงก์เอกสารแนบ</label><input id="activity-attachment" class="form-control" placeholder="https://..."></div>
+        <div class="form-group"><label class="form-label">อัปโหลดไฟล์ไปยังโฟลเดอร์ระบบ</label><input id="activity-file" type="file" class="form-control"><small style="color:var(--muted)">ขนาดไม่เกิน 10 MB</small></div>
+        <div class="form-group full"><label class="form-label">สีแสดงผล</label><input id="activity-color" type="hidden" value="#8F1D54"><div id="activity-color-row" class="color-row"></div></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-soft" onclick="closeModal('activity-modal')">ยกเลิก</button><button id="save-activity-btn" class="btn btn-primary" onclick="submitActivity()"><i data-lucide="save"></i>บันทึกกิจกรรม</button></div>
+  </div>
+</div>
+
+<!-- Central form -->
+<div id="central-modal" class="modal hidden" onclick="backdropClose(event,'central-modal')">
+  <div class="modal-card">
+    <div class="modal-head gold"><h3 id="central-modal-title">เพิ่มข้อมูลปฏิทินกลาง</h3><button class="modal-close" onclick="closeModal('central-modal')"><i data-lucide="x"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="central-mode" value="add"><input type="hidden" id="central-row-number">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">วันที่ <span class="required">*</span></label><input id="central-date" type="date" class="form-control"></div>
+        <div class="form-group"><label class="form-label">จันทรคติ</label><input id="central-lunar" class="form-control" placeholder="เช่น แรม 8 ค่ำ เดือน 8"></div>
+        <div class="form-group"><label class="form-label">ประเภท <span class="required">*</span></label><select id="central-type" class="form-control"></select></div>
+        <div class="form-group"><label class="form-label">ไอคอน</label><select id="central-icon-key" class="form-control"></select><div class="icon-help">เลือก “อัตโนมัติตามประเภท” หรือกำหนดเฉพาะรายการนี้ได้ โดยแก้ตัวเลือกทั้งหมดในชีต ตั้งค่าไอคอน</div></div>
+        <div class="form-group"><label class="form-label">สถานะแสดงผล</label><select id="central-visibility" class="form-control"></select></div>
+        <div class="form-group full"><label class="form-label">ชื่อวันหรือกิจกรรม</label><input id="central-title" class="form-control"></div>
+        <div class="form-group"><label class="form-label">แหล่งข้อมูล</label><input id="central-source" class="form-control" value="ปฏิทินส่วนกลาง มจร."></div>
+        <div class="form-group"><label class="form-label">ลำดับแสดงผล</label><input id="central-order" type="number" class="form-control" value="10"></div>
+        <div class="form-group full"><label class="form-label">หมายเหตุ</label><textarea id="central-note" class="form-control"></textarea></div>
+        <div class="check-row"><input id="central-buddhist" type="checkbox"><label for="central-buddhist">เป็นวันพระ</label></div>
+        <div class="check-row"><input id="central-holiday" type="checkbox"><label for="central-holiday">เป็นวันหยุด</label></div>
+        <div class="form-group full"><label class="form-label">สีแสดงผล</label><input id="central-color" type="hidden" value="#D5A62E"><div id="central-color-row" class="color-row"></div></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-soft" onclick="closeModal('central-modal')">ยกเลิก</button><button class="btn btn-gold" onclick="submitCentral()"><i data-lucide="save"></i>บันทึกข้อมูล</button></div>
+  </div>
+</div>
+
+<!-- Password modal -->
+<div id="password-modal" class="modal hidden" onclick="backdropClose(event,'password-modal')">
+  <div class="modal-card small">
+    <div class="modal-head"><h3>เปลี่ยนรหัสผ่านผู้ดูแล</h3><button class="modal-close" onclick="closeModal('password-modal')"><i data-lucide="x"></i></button></div>
+    <div class="modal-body"><div class="form-grid"><div class="form-group full"><label class="form-label">รหัสผ่านเดิม</label><input id="old-password" type="password" class="form-control"></div><div class="form-group full"><label class="form-label">รหัสผ่านใหม่</label><input id="new-password" type="password" class="form-control" minlength="8"></div><div class="form-group full"><label class="form-label">ยืนยันรหัสผ่านใหม่</label><input id="confirm-password" type="password" class="form-control" minlength="8"></div></div></div>
+    <div class="modal-footer"><button class="btn btn-soft" onclick="closeModal('password-modal')">ยกเลิก</button><button class="btn btn-primary" onclick="submitPasswordChange()">บันทึกรหัสผ่าน</button></div>
+  </div>
+</div>
+
+<script>
+  const CLIENT_VERSION='2026.07.06-ICON7-BOOTREADY';
+
+  function safeSessionGet(key){
+    try{return window.sessionStorage ? window.sessionStorage.getItem(key) : ''}catch(err){return ''}
+  }
+  function safeSessionSet(key,value){
+    try{if(window.sessionStorage)window.sessionStorage.setItem(key,value)}catch(err){}
+  }
+  function safeSessionRemove(key){
+    try{if(window.sessionStorage)window.sessionStorage.removeItem(key)}catch(err){}
+  }
+  function safeLucide(){
+    try{if(window.lucide&&typeof window.lucide.createIcons==='function')window.lucide.createIcons()}catch(err){console.warn('Lucide unavailable',err)}
+  }
+  function setSyncStatus(text,mode='ready'){
+    const el=document.getElementById('sync-text');
+    if(el)el.textContent=text;
+    const dot=document.querySelector('.sync-pill .toast-dot');
+    if(dot)dot.style.background=mode==='error'?'#B4233E':mode==='loading'?'#D5A62E':'#21836A';
+  }
+
+  const state = {
+    settings:{}, options:{}, iconSettings:[], activities:[], central:[], currentDate:new Date(), currentView:'calendar', adminTab:'activities',
+    adminToken:safeSessionGet('mcuCalendarAdminToken') || '',
+    importPreview:{meta:null,stats:null,items:[]}, importHistory:[], loadingPromise:null,
+    filters:{activities:true,lunar:true,buddhist:true,holiday:true,central:true}
+  };
+  const monthNames=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+
+  let bootStarted=false;
+  function startBoot(){
+    if(bootStarted)return;
+    bootStarted=true;
+    Promise.resolve().then(bootApplication).catch(function(err){
+      showLoader(false);
+      setSyncStatus('เริ่มระบบไม่สำเร็จ','error');
+      showError(err);
+    });
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',startBoot,{once:true});
+  }else{
+    setTimeout(startBoot,0);
+  }
+  window.addEventListener('pageshow',function(){if(!bootStarted)startBoot()},{once:true});
+  window.addEventListener('error', function(event){
+    showLoader(false);
+    console.error('Window error:', event.error || event.message);
+  });
+  window.addEventListener('unhandledrejection', function(event){
+    showLoader(false);
+    console.error('Unhandled rejection:', event.reason);
+  });
+
+  async function bootApplication(){
+    // แสดงโครงหน้าเว็บและปฏิทินเปล่าทันที แม้ HTML Service จะรันสคริปต์หลัง DOMContentLoaded
+    showLoader(false);
+    setSyncStatus('กำลังเตรียมปฏิทิน...','loading');
+    if(!(state.currentDate instanceof Date)||Number.isNaN(state.currentDate.getTime()))state.currentDate=new Date();
+    safeLucide();
+    try{
+      renderAll();
+    }catch(err){
+      console.warn('Initial render warning',err);
+      // อย่างน้อยต้องแสดงชื่อเดือนและช่องวันที่ แม้ส่วนรายงาน/หลังบ้านมีปัญหา
+      try{renderMonthTitle();renderCalendar()}catch(innerErr){console.error('Calendar fallback failed',innerErr)}
+    }
+
+    if(!window.google||!window.google.script||!window.google.script.run){
+      setSyncStatus('เปิดไม่ผ่าน Web App','error');
+      showError(new Error('ไม่พบตัวเชื่อม Google Apps Script กรุณาเปิดผ่านลิงก์ Web App ที่ Deploy แล้ว'));
+      return;
+    }
+
+    setSyncStatus('กำลังอ่านข้อมูล...','loading');
+    await refreshAll(false,false);
+  }
+
+  function callServer(name,...args){
+    return new Promise((resolve,reject)=>{
+      let settled=false;
+      const timeoutId=setTimeout(()=>{
+        if(settled)return;
+        settled=true;
+        reject(new Error('การเชื่อมต่อใช้เวลานานเกิน 25 วินาที กรุณารีเฟรชหน้าเว็บหรือตรวจสอบการ Deploy'));
+      },25000);
+      const finish=(handler)=>(value)=>{
+        if(settled)return;
+        settled=true;
+        clearTimeout(timeoutId);
+        handler(value);
+      };
+      const runner=google.script.run
+        .withSuccessHandler(finish(resolve))
+        .withFailureHandler(finish(error=>reject(normalizeServerError(error))));
+
+      const serverActions={
+        getBootstrapData:()=>runner.getBootstrapData(),
+        validateAdminToken:()=>runner.validateAdminToken(args[0]),
+        loginAdmin:()=>runner.loginAdmin(args[0]),
+        logoutAdmin:()=>runner.logoutAdmin(args[0]),
+        uploadAttachment:()=>runner.uploadAttachment(args[0],args[1]),
+        saveActivity:()=>runner.saveActivity(args[0],args[1]),
+        deleteActivity:()=>runner.deleteActivity(args[0],args[1]),
+        saveCentralItem:()=>runner.saveCentralItem(args[0],args[1]),
+        deleteCentralItem:()=>runner.deleteCentralItem(args[0],args[1]),
+        previewIcsFromUrl:()=>runner.previewIcsFromUrl(args[0],args[1],args[2]),
+        previewIcsFile:()=>runner.previewIcsFile(args[0],args[1],args[2]),
+        commitIcsImport:()=>runner.commitIcsImport(args[0],args[1]),
+        getImportHistory:()=>runner.getImportHistory(args[0],args[1]),
+        rollbackIcsImport:()=>runner.rollbackIcsImport(args[0],args[1]),
+        saveSettings:()=>runner.saveSettings(args[0],args[1]),
+        getSystemLogs:()=>runner.getSystemLogs(args[0],args[1]),
+        changeAdminPassword:()=>runner.changeAdminPassword(args[0],args[1],args[2])
+      };
+
+      const action=serverActions[name];
+      if(!action){
+        reject(new Error('ไม่พบฟังก์ชันฝั่งเซิร์ฟเวอร์: '+name));
+        return;
+      }
+
+      try{
+        action();
+      }catch(err){
+        reject(normalizeServerError(err));
+      }
+    });
+  }
+
+  function normalizeServerError(error){
+    if(error instanceof Error)return error;
+    if(error&&typeof error==='object'){
+      const message=error.message||error.details||error.toString?.();
+      return new Error(message||'ไม่สามารถติดต่อ Google Apps Script ได้');
+    }
+    return new Error(String(error||'ไม่สามารถติดต่อ Google Apps Script ได้'));
+  }
+
+  async function refreshAll(showToast=true,useOverlay=true){
+    if(state.loadingPromise)return state.loadingPromise;
+
+    state.loadingPromise=(async()=>{
+      if(useOverlay)showLoader(true);
+      setSyncStatus('กำลังอ่านข้อมูล...','loading');
+      const loaderText=document.querySelector('#loader .loader-box');
+      const originalText=loaderText?loaderText.innerHTML:'';
+      try{
+        if(useOverlay&&loaderText)loaderText.innerHTML='<div class="spinner"></div>กำลังอ่านข้อมูลจาก Google Sheets...';
+        const res=await callServer('getBootstrapData');
+        ensureSuccess(res);
+        state.settings=res.settings||{};
+        state.options=res.options||{};
+        state.iconSettings=res.iconSettings||[];
+        state.activities=res.activities||[];
+        state.central=res.centralCalendar||[];
+        applySettings();
+        populateSelects();
+        renderAll();
+        const elapsed=Number(res.serverElapsedMs||0);
+        setSyncStatus(elapsed?`เชื่อมต่อแล้ว · ${elapsed} ms`:'เชื่อมต่อระบบแล้ว','ready');
+        if(showToast)toast('อัปเดตข้อมูลเรียบร้อยแล้ว','success');
+        return res;
+      }catch(err){
+        setSyncStatus('เชื่อมต่อไม่สำเร็จ','error');
+        showError(err);
+        return null;
+      }finally{
+        if(loaderText&&originalText)loaderText.innerHTML=originalText;
+        showLoader(false);
+        state.loadingPromise=null;
+      }
+    })();
+
+    return state.loadingPromise;
+  }
+
+  function applySettings(){
+    const s=state.settings;
+    const primary=s.THEME_PRIMARY||'#8F1D54', purple=s.THEME_SECONDARY||'#6B2C91', gold=s.THEME_GOLD||'#D5A62E', ivory=s.THEME_BACKGROUND||'#FFFDF8';
+    document.documentElement.style.setProperty('--primary',primary);document.documentElement.style.setProperty('--purple',purple);document.documentElement.style.setProperty('--gold',gold);document.documentElement.style.setProperty('--ivory',ivory);
+    document.getElementById('brand-logo').src=s.LOGO_URL||'https://img2.pic.in.th/-a47d4369f36e7693.png';
+    document.getElementById('brand-title').textContent=s.SYSTEM_NAME||'ระบบปฏิทินกิจกรรม';
+    document.getElementById('brand-subtitle').textContent=(s.ORGANIZATION||'หน่วยวิทยบริการ วิทยาลัยสงฆ์ขอนแก่น จังหวัดกาฬสินธุ์')+' · '+(s.UNIVERSITY_NAME||'มหาวิทยาลัยมหาจุฬาลงกรณราชวิทยาลัย');
+    document.getElementById('footer-system').textContent=s.SYSTEM_NAME||'ระบบปฏิทินกิจกรรม';
+    document.getElementById('footer-org').textContent=s.ORGANIZATION||'';
+    document.getElementById('footer-developer').textContent=(s.DEVELOPER||'พระมหาธงชัย วิลาสินี')+' '+(s.DEVELOPER_POSITION||'นักวิชาการศึกษา');const versionEl=document.getElementById('client-version');if(versionEl)versionEl.textContent='เวอร์ชัน '+CLIENT_VERSION;
+    state.filters.lunar=asBool(s.SHOW_LUNAR,true);state.filters.buddhist=asBool(s.SHOW_BUDDHIST_DAY,true);state.filters.holiday=asBool(s.SHOW_HOLIDAY,true);
+    document.querySelectorAll('.filter-chip').forEach(chip=>chip.classList.toggle('active',state.filters[chip.dataset.filter]!==false));
+    if(document.getElementById('import-url') && !state.importPreview.items.length) applyImportPreset(!document.getElementById('import-url').value.trim());
+  }
+
+  function renderAll(){renderMonthTitle();renderCalendar();renderReport();renderAdminActivities();renderAdminCentral();renderSettingsForm();safeLucide()}
+  function renderMonthTitle(){const y=state.currentDate.getFullYear()+543,m=state.currentDate.getMonth();document.getElementById('month-title').textContent=monthNames[m]+' '+y;document.getElementById('report-period').textContent='ประจำเดือน '+monthNames[m]+' พ.ศ. '+y;document.getElementById('report-org').textContent=(state.settings.ORGANIZATION||'')+' · '+(state.settings.UNIVERSITY_NAME||'')}
+  function changeMonth(offset){state.currentDate=new Date(state.currentDate.getFullYear(),state.currentDate.getMonth()+offset,1);renderAll()}
+  function goToday(){state.currentDate=new Date();renderAll()}
+  function toggleFilter(btn){const key=btn.dataset.filter;state.filters[key]=!state.filters[key];btn.classList.toggle('active',state.filters[key]);renderCalendar()}
+
+  function lunarToArabic(text){return String(text||'').replace(/[๐-๙]/g,d=>'๐๑๒๓๔๕๖๗๘๙'.indexOf(d))}
+  function getMoonPhaseInfo(lunar){
+    const text=lunarToArabic(lunar);
+    if(/ขึ้น\s*8\s*ค่ำ/.test(text)) return {phase:'waxing-half',label:'วันพระ ขึ้น 8 ค่ำ'};
+    if(/ขึ้น\s*(14|15)\s*ค่ำ/.test(text)) return {phase:'waxing-full',label:'วันพระ ขึ้น 14/15 ค่ำ'};
+    if(/แรม\s*8\s*ค่ำ/.test(text)) return {phase:'waning-half',label:'วันพระ แรม 8 ค่ำ'};
+    if(/แรม\s*(14|15)\s*ค่ำ/.test(text)) return {phase:'waning-full',label:'วันพระ แรม 14/15 ค่ำ'};
+    return {phase:'waxing-full',label:'วันพระ'};
+  }
+  function renderMoonIcon(lunar){
+    const info=getMoonPhaseInfo(lunar);
+    return `<span class="mini-icon buddha" title="${escapeAttr(info.label)}"><span class="moon-phase ${info.phase}"></span></span>`;
+  }
+  function safeColor(value,fallback){const text=String(value||'').trim();return /^#[0-9a-fA-F]{6}$/.test(text)?text:fallback}
+  function safeImageUrl(value){const text=String(value||'').trim();return /^https:\/\//i.test(text)?text:''}
+  function getIconConfig(item){
+    const list=(state.iconSettings||[]).filter(x=>x&&x.enabled!==false);
+    if(item?.iconKey){const exact=list.find(x=>x.key===item.iconKey);if(exact)return exact}
+    if(item?.type){const byType=list.find(x=>x.defaultType===item.type);if(byType)return byType}
+    if(String(item?.source||'').includes('ส่วนกลาง มจร')||String(item?.type||'').includes('ส่วนกลาง มจร'))return list.find(x=>x.key==='MCU_LOGO')||null;
+    return list.find(x=>x.key==='CENTRAL_SPARKLE')||null;
+  }
+  function renderConfiguredIcon(item,lunar){
+    const cfg=getIconConfig(item);
+    if(!cfg)return '';
+    const type=String(cfg.iconType||'');
+    if(type==='ไม่แสดง')return '';
+    if(type==='พระจันทร์อัตโนมัติ')return renderMoonIcon(lunar||item?.lunar||'');
+    const size=Math.min(Math.max(Number(cfg.size||20),14),32);
+    const bg=safeColor(cfg.backgroundColor,'#FFFFFF');
+    const color=safeColor(cfg.iconColor,'#6B2C91');
+    const title=escapeAttr(cfg.name||item?.type||'ไอคอน');
+    const style=`width:${size}px;height:${size}px;background:${bg};color:${color};border-color:${color}55`;
+    if(type==='โลโก้ระบบ'){
+      const url=safeImageUrl(state.settings.LOGO_URL);
+      return url?`<span class="mini-icon configured-icon" title="${title}" style="${style}"><img src="${escapeAttr(url)}" alt=""></span>`:'';
+    }
+    if(type==='รูปภาพ URL'){
+      const url=safeImageUrl(cfg.imageUrl||cfg.iconValue);
+      return url?`<span class="mini-icon configured-icon" title="${title}" style="${style}"><img src="${escapeAttr(url)}" alt=""></span>`:'';
+    }
+    if(type==='Lucide'){
+      const name=/^[a-z0-9-]+$/i.test(String(cfg.iconValue||''))?String(cfg.iconValue):'sparkles';
+      return `<span class="mini-icon configured-icon" title="${title}" style="${style}"><i data-lucide="${escapeAttr(name)}"></i></span>`;
+    }
+    if(type==='Emoji')return `<span class="mini-icon configured-icon emoji-icon" title="${title}" style="${style}">${escapeHtml(cfg.iconValue||'✨')}</span>`;
+    return '';
+  }
+
+  function renderCalendar(){
+    const grid=document.getElementById('calendar-grid');grid.innerHTML='';
+    const y=state.currentDate.getFullYear(),m=state.currentDate.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+    for(let i=0;i<first;i++)grid.insertAdjacentHTML('beforeend','<div class="day-cell empty"></div>');
+    const todayKey=toKey(new Date());
+    for(let d=1;d<=days;d++){
+      const date=new Date(y,m,d),key=toKey(date),weekday=date.getDay();
+      const activities=state.activities.filter(a=>state.filters.activities&&key>=a.startDate&&key<=a.endDate);
+      const central=state.central.filter(c=>c.date===key&&c.visibility!=='ซ่อน');
+      const buddhist=central.some(c=>c.isBuddhistDay),holiday=central.some(c=>c.isHoliday);
+      const lunar=(central.find(c=>c.lunar)||{}).lunar||'';
+      const classes=['day-cell',weekday===0?'sunday':'',weekday===6?'saturday':'',key===todayKey?'today':'',holiday&&state.filters.holiday?'holiday':'',buddhist&&state.filters.buddhist?'buddhist':''].filter(Boolean).join(' ');
+      const icons=[],seenIcons=new Set();
+      if(buddhist&&state.filters.buddhist){icons.push(renderMoonIcon(lunar));seenIcons.add('MOON_AUTO')}
+      central.slice().sort((a,b)=>a.displayOrder-b.displayOrder).forEach(c=>{
+        if(c.type==='ข้อมูลจันทรคติ')return;
+        if(c.isBuddhistDay&&c.type==='วันพระ')return;
+        if(c.isHoliday&&!state.filters.holiday)return;
+        if(c.isBuddhistDay&&!state.filters.buddhist)return;
+        if(!c.isHoliday&&!c.isBuddhistDay&&!state.filters.central)return;
+        const cfg=getIconConfig(c),unique=cfg?.key||c.iconKey||c.type;
+        if(!unique||seenIcons.has(unique))return;
+        const icon=renderConfiguredIcon(c,lunar);
+        if(icon){icons.push(icon);seenIcons.add(unique)}
+      });
+      const eventHtml=activities.sort((a,b)=>a.title.localeCompare(b.title,'th')).map(a=>`<button class="event-card ${a.status==='เสร็จสิ้น'?'done':''} ${a.status==='ยกเลิก'?'cancelled':''}" style="background:linear-gradient(135deg,${escapeAttr(a.color||'#8F1D54')},#6B2C91)" onclick="openActivityDetail('${escapeAttr(a.id)}')"><div class="event-title">${escapeHtml(a.title)}</div><div class="event-meta">${escapeHtml(a.type||'กิจกรรม')}</div></button>`).join('');
+      const tags=central.filter(c=>{
+        if(c.isHoliday&&state.filters.holiday)return true;
+        if(c.isBuddhistDay&&state.filters.buddhist&&c.title&&c.title!=='วันพระ')return true;
+        return state.filters.central&&c.type!=='ข้อมูลจันทรคติ'&&!c.isBuddhistDay&&!c.isHoliday;
+      }).sort((a,b)=>a.displayOrder-b.displayOrder).map(c=>`<span class="central-tag" style="border-color:${escapeAttr(c.color||'#D5A62E')}55;color:${escapeAttr(c.color||'#8F1D54')}">${escapeHtml(c.title||c.type)}</span>`).join('');
+      grid.insertAdjacentHTML('beforeend',`<div class="${classes}" data-date="${key}"><div class="day-top"><div class="day-number">${d}</div><div class="day-icons">${icons.slice(0,4).join('')}</div></div>${eventHtml?`<div class="events-list">${eventHtml}</div>`:''}${tags?`<div class="central-tags">${tags}</div>`:''}${state.filters.lunar&&lunar?`<div class="lunar">${escapeHtml(lunar)}</div>`:''}</div>`);
+    }
+    renderMonthlyNotes();safeLucide();
+  }
+
+  function renderMonthlyNotes(){
+    const y=state.currentDate.getFullYear(),m=state.currentDate.getMonth();
+    const rows=state.central.filter(c=>{
+      if(!c.date||!c.title||c.type==='ข้อมูลจันทรคติ'||c.visibility==='ซ่อน')return false;
+      const dt=parseKey(c.date);
+      if(dt.getFullYear()!==y||dt.getMonth()!==m)return false;
+      if(c.isHoliday)return state.filters.holiday;
+      if(c.isBuddhistDay)return state.filters.buddhist;
+      return state.filters.central;
+    }).sort((a,b)=>a.date.localeCompare(b.date)||a.displayOrder-b.displayOrder);
+    document.getElementById('notes-count').textContent=rows.length+' รายการ';
+    document.getElementById('monthly-notes').innerHTML=rows.length?rows.map(c=>{const d=parseKey(c.date);return `<div class="note-card"><div class="note-date">${d.getDate()}<div style="font-size:9px;font-weight:500">${monthNames[d.getMonth()].slice(0,3)}</div></div><div><div class="note-title">${escapeHtml(c.title||c.type)}</div><div class="note-sub">${escapeHtml([c.type,c.lunar,c.note].filter(Boolean).join(' · '))}</div></div></div>`}).join(''):'<div class="empty-state" style="grid-column:1/-1;padding:24px">ยังไม่มีวันสำคัญในเดือนนี้</div>';
+  }
+
+  function renderReport(){
+    const y=state.currentDate.getFullYear(),m=state.currentDate.getMonth();
+    const rows=state.activities.filter(a=>{const s=parseKey(a.startDate),e=parseKey(a.endDate||a.startDate),from=new Date(y,m,1),to=new Date(y,m+1,0);return e>=from&&s<=to}).sort((a,b)=>a.startDate.localeCompare(b.startDate));
+    document.getElementById('report-body').innerHTML=rows.length?rows.map(a=>`<tr><td>${formatRange(a.startDate,a.endDate)}</td><td><strong>${escapeHtml(a.title)}</strong>${a.description?`<div style="font-size:12px;color:var(--muted);margin-top:3px">${escapeHtml(a.description)}</div>`:''}</td><td><span class="type-badge" style="background:${escapeAttr(a.color||'#8F1D54')}18;color:${escapeAttr(a.color||'#8F1D54')}">${escapeHtml(a.type||'-')}</span></td><td>${escapeHtml(a.owner||'-')}</td><td>${escapeHtml(a.related||'-')}</td><td>${escapeHtml(a.location||'-')}</td><td><span class="status-badge">${escapeHtml(a.status||'-')}</span></td></tr>`).join(''):'<tr><td colspan="7" class="empty-state">ไม่มีกิจกรรมในเดือนนี้</td></tr>';
+  }
+
+  async function switchView(view){
+    if(view==='admin'&&!state.adminToken){const ok=await adminLogin();if(!ok)return}
+    if(view==='admin'&&state.adminToken){const res=await callServer('validateAdminToken',state.adminToken);if(!res||res.status!=='success'){state.adminToken='';safeSessionRemove('mcuCalendarAdminToken');const ok=await adminLogin();if(!ok)return}}
+    state.currentView=view;
+    ['calendar','report','admin'].forEach(v=>{document.getElementById(v+'-view').classList.toggle('hidden',v!==view);document.getElementById('tab-'+v).classList.toggle('active',v===view)});
+    document.getElementById('calendar-filters').classList.toggle('hidden',view!=='calendar');document.getElementById('print-btn').classList.toggle('hidden',view!=='report');
+    if(view==='admin')switchAdminTab(state.adminTab);safeLucide();
+  }
+
+  async function adminLogin(){
+    const result=await Swal.fire({title:'เข้าสู่ระบบผู้ดูแล',text:'กรอกรหัสผ่านเพื่อจัดการข้อมูล',input:'password',inputPlaceholder:'รหัสผ่านผู้ดูแล',showCancelButton:true,confirmButtonText:'เข้าสู่ระบบ',cancelButtonText:'ยกเลิก',confirmButtonColor:'#8F1D54',showLoaderOnConfirm:true,preConfirm:async password=>{const res=await callServer('loginAdmin',password);if(res.status!=='success'){Swal.showValidationMessage(res.message||'เข้าสู่ระบบไม่สำเร็จ');return false}return res},allowOutsideClick:()=>!Swal.isLoading()});
+    if(result.isConfirmed&&result.value){state.adminToken=result.value.token;safeSessionSet('mcuCalendarAdminToken',state.adminToken);toast('เข้าสู่ระบบสำเร็จ','success');return true}return false;
+  }
+  async function adminLogout(){if(!state.adminToken)return;await callServer('logoutAdmin',state.adminToken);state.adminToken='';safeSessionRemove('mcuCalendarAdminToken');switchView('calendar');toast('ออกจากระบบแล้ว','success')}
+
+  function switchAdminTab(tab){state.adminTab=tab;['activities','central','import','settings','logs'].forEach(v=>{document.getElementById('admin-'+v).classList.toggle('hidden',v!==tab);document.getElementById('admin-tab-'+v).classList.toggle('active',v===tab)});if(tab==='logs')loadLogs();if(tab==='import')loadImportHistory();safeLucide()}
+
+  function renderAdminActivities(){
+    const rows=[...state.activities].sort((a,b)=>b.startDate.localeCompare(a.startDate));
+    document.getElementById('admin-activity-body').innerHTML=rows.length?rows.map(a=>`<tr><td>${formatRange(a.startDate,a.endDate)}</td><td><strong>${escapeHtml(a.title)}</strong></td><td>${escapeHtml(a.type||'-')}</td><td>${escapeHtml(a.owner||'-')}</td><td><span class="status-badge">${escapeHtml(a.status||'-')}</span></td><td><div style="display:flex;gap:6px"><button class="btn btn-soft btn-sm" onclick="openActivityForm('${escapeAttr(a.id)}')"><i data-lucide="pencil"></i></button><button class="btn btn-danger btn-sm" onclick="confirmDeleteActivity('${escapeAttr(a.id)}')"><i data-lucide="trash-2"></i></button></div></td></tr>`).join(''):'<tr><td colspan="6" class="empty-state">ยังไม่มีกิจกรรม</td></tr>';safeLucide();
+  }
+
+  function renderAdminCentral(){
+    const rows=[...state.central].sort((a,b)=>b.date.localeCompare(a.date)||a.displayOrder-b.displayOrder);
+    document.getElementById('admin-central-body').innerHTML=rows.length?rows.map(c=>`<tr><td>${formatThaiDate(c.date)}</td><td>${escapeHtml(c.lunar||'-')}</td><td>${escapeHtml(c.type||'-')}</td><td><strong>${escapeHtml(c.title||'-')}</strong></td><td>${renderConfiguredIcon(c,c.lunar)||'-'}</td><td>${c.isBuddhistDay?'✓':'-'}</td><td>${c.isHoliday?'✓':'-'}</td><td><div style="display:flex;gap:6px"><button class="btn btn-soft btn-sm" onclick="openCentralForm(${c.rowNumber})"><i data-lucide="pencil"></i></button><button class="btn btn-danger btn-sm" onclick="confirmDeleteCentral(${c.rowNumber})"><i data-lucide="trash-2"></i></button></div></td></tr>`).join(''):'<tr><td colspan="8" class="empty-state">ยังไม่มีข้อมูลปฏิทินกลาง</td></tr>';safeLucide();
+  }
+
+  function populateSelects(){
+    fillSelect('activity-type',state.options.activityTypes,'อื่นๆ');fillSelect('activity-status',state.options.activityStatuses,'รอดำเนินการ');fillSelect('central-type',state.options.centralTypes,'วันพระ');fillSelect('central-visibility',state.options.visibilityStatuses,'แสดง');fillIconSelect('central-icon-key','');
+    renderColorChoices('activity-color-row','activity-color',state.options.themeColors.length?state.options.themeColors:['#8F1D54','#C52F72','#6B2C91','#245A9C','#21836A','#D5A62E']);
+    renderColorChoices('central-color-row','central-color',state.options.themeColors.length?state.options.themeColors:['#D5A62E','#8F1D54','#6B2C91','#B4233E','#245A9C']);
+  }
+  function fillSelect(id,items,selected){const el=document.getElementById(id);if(!el)return;el.innerHTML=(items||[]).map(x=>`<option value="${escapeAttr(x)}">${escapeHtml(x)}</option>`).join('');if(selected&&[...el.options].some(o=>o.value===selected))el.value=selected}
+  function fillIconSelect(id,selected){const el=document.getElementById(id);if(!el)return;const rows=(state.iconSettings||[]).filter(x=>x.enabled!==false);el.innerHTML='<option value="">อัตโนมัติตามประเภท</option>'+rows.map(x=>`<option value="${escapeAttr(x.key)}">${escapeHtml(x.name)} (${escapeHtml(x.key)})</option>`).join('');el.value=[...el.options].some(o=>o.value===selected)?selected:''}
+  function renderColorChoices(containerId,inputId,colors){const selected=document.getElementById(inputId).value;document.getElementById(containerId).innerHTML=colors.map(c=>`<button type="button" class="color-choice ${c===selected?'selected':''}" style="background:${escapeAttr(c)}" onclick="selectColor('${containerId}','${inputId}','${escapeAttr(c)}',this)" title="${escapeAttr(c)}"></button>`).join('')}
+  function selectColor(containerId,inputId,color,btn){document.getElementById(inputId).value=color;document.querySelectorAll('#'+containerId+' .color-choice').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected')}
+
+  function openActivityDetail(id){
+    const a=state.activities.find(x=>x.id===id);if(!a)return;
+    document.getElementById('detail-title').textContent=a.title;
+    const items=[['วันเวลา',formatRange(a.startDate,a.endDate)],['ประเภท',a.type||'-'],['ผู้รับผิดชอบ',a.owner||'-'],['ผู้เกี่ยวข้อง',a.related||'-'],['สถานที่',a.location||'-'],['สถานะ',a.status||'-'],['รายละเอียด',a.description||'-','full'],['เอกสารแนบ',a.attachmentUrl?`<a href="${escapeAttr(a.attachmentUrl)}" target="_blank" style="color:var(--primary);text-decoration:underline">เปิดเอกสารแนบ</a>`:'-','full',true]];
+    document.getElementById('detail-content').innerHTML=items.map(([k,v,cls,html])=>`<div class="detail-item ${cls||''}"><div class="detail-key">${escapeHtml(k)}</div><div class="detail-value">${html?v:escapeHtml(v)}</div></div>`).join('');openModal('detail-modal')
+  }
+
+  function openActivityForm(id=''){
+    const a=id?state.activities.find(x=>x.id===id):null;
+    document.getElementById('activity-modal-title').textContent=a?'แก้ไขกิจกรรม':'เพิ่มกิจกรรมใหม่';document.getElementById('activity-mode').value=a?'edit':'add';document.getElementById('activity-id').value=a?.id||'';document.getElementById('activity-row-number').value=a?.rowNumber||'';
+    document.getElementById('activity-start').value=a?.startDate||toKey(new Date());document.getElementById('activity-end').value=a?.endDate||a?.startDate||toKey(new Date());document.getElementById('activity-title').value=a?.title||'';setSelectValue('activity-type',a?.type||'อื่นๆ');setSelectValue('activity-status',a?.status||'รอดำเนินการ');document.getElementById('activity-owner').value=a?.owner||'';document.getElementById('activity-related').value=a?.related||'';document.getElementById('activity-location').value=a?.location||'';document.getElementById('activity-description').value=a?.description||'';document.getElementById('activity-attachment').value=a?.attachmentUrl||'';document.getElementById('activity-file').value='';document.getElementById('activity-color').value=a?.color||'#8F1D54';renderColorChoices('activity-color-row','activity-color',state.options.themeColors.length?state.options.themeColors:['#8F1D54','#C52F72','#6B2C91','#245A9C','#21836A','#D5A62E']);openModal('activity-modal')
+  }
+
+  async function submitActivity(){
+    const title=document.getElementById('activity-title').value.trim(),start=document.getElementById('activity-start').value;if(!title||!start){toast('กรุณากรอกวันที่เริ่มและชื่อกิจกรรม','warning');return}
+    setButtonLoading('save-activity-btn',true,'กำลังบันทึก...');
+    try{
+      let attachmentUrl=document.getElementById('activity-attachment').value.trim();const file=document.getElementById('activity-file').files[0];if(file){const encoded=await readFileBase64(file);const upload=await callServer('uploadAttachment',state.adminToken,{name:file.name,mimeType:file.type,base64:encoded});ensureSuccess(upload);attachmentUrl=upload.url}
+      const payload={mode:document.getElementById('activity-mode').value,id:document.getElementById('activity-id').value,rowNumber:document.getElementById('activity-row-number').value,startDate:start,endDate:document.getElementById('activity-end').value||start,title,type:document.getElementById('activity-type').value,status:document.getElementById('activity-status').value,owner:document.getElementById('activity-owner').value,related:document.getElementById('activity-related').value,location:document.getElementById('activity-location').value,description:document.getElementById('activity-description').value,color:document.getElementById('activity-color').value,attachmentUrl};
+      const res=await callServer('saveActivity',state.adminToken,payload);ensureSuccess(res);closeModal('activity-modal');await refreshAll(false);toast('บันทึกกิจกรรมเรียบร้อยแล้ว','success');
+    }catch(err){showError(err)}finally{setButtonLoading('save-activity-btn',false,'<i data-lucide="save"></i>บันทึกกิจกรรม');safeLucide()}
+  }
+
+  async function confirmDeleteActivity(id){const a=state.activities.find(x=>x.id===id);const result=await Swal.fire({title:'ยืนยันการลบกิจกรรม?',text:a?.title||'',icon:'warning',showCancelButton:true,confirmButtonText:'ลบข้อมูล',cancelButtonText:'ยกเลิก',confirmButtonColor:'#B4233E'});if(!result.isConfirmed)return;showLoader(true);try{const res=await callServer('deleteActivity',state.adminToken,id,a.rowNumber);ensureSuccess(res);await refreshAll(false);toast('ลบกิจกรรมเรียบร้อยแล้ว','success')}catch(err){showError(err)}finally{showLoader(false)}}
+
+  function openCentralForm(rowNumber=''){
+    const c=rowNumber?state.central.find(x=>Number(x.rowNumber)===Number(rowNumber)):null;
+    document.getElementById('central-modal-title').textContent=c?'แก้ไขข้อมูลปฏิทินกลาง':'เพิ่มข้อมูลปฏิทินกลาง';document.getElementById('central-mode').value=c?'edit':'add';document.getElementById('central-row-number').value=c?.rowNumber||'';document.getElementById('central-date').value=c?.date||toKey(new Date());document.getElementById('central-lunar').value=c?.lunar||'';setSelectValue('central-type',c?.type||'วันพระ');setSelectValue('central-visibility',c?.visibility||'แสดง');document.getElementById('central-title').value=c?.title||'';document.getElementById('central-source').value=c?.source||'ปฏิทินส่วนกลาง มจร.';document.getElementById('central-order').value=c?.displayOrder||10;document.getElementById('central-note').value=c?.note||'';document.getElementById('central-buddhist').checked=!!c?.isBuddhistDay;document.getElementById('central-holiday').checked=!!c?.isHoliday;document.getElementById('central-color').value=c?.color||'#D5A62E';fillIconSelect('central-icon-key',c?.iconKey||'');renderColorChoices('central-color-row','central-color',state.options.themeColors.length?state.options.themeColors:['#D5A62E','#8F1D54','#6B2C91','#B4233E','#245A9C']);openModal('central-modal')
+  }
+
+  async function submitCentral(){
+    const date=document.getElementById('central-date').value,type=document.getElementById('central-type').value;if(!date||!type){toast('กรุณาระบุวันที่และประเภท','warning');return}
+    showLoader(true);try{const payload={mode:document.getElementById('central-mode').value,rowNumber:document.getElementById('central-row-number').value,date,lunar:document.getElementById('central-lunar').value,type,title:document.getElementById('central-title').value,isBuddhistDay:document.getElementById('central-buddhist').checked,isHoliday:document.getElementById('central-holiday').checked,source:document.getElementById('central-source').value,note:document.getElementById('central-note').value,visibility:document.getElementById('central-visibility').value,color:document.getElementById('central-color').value,displayOrder:document.getElementById('central-order').value,iconKey:document.getElementById('central-icon-key').value};const res=await callServer('saveCentralItem',state.adminToken,payload);ensureSuccess(res);closeModal('central-modal');await refreshAll(false);toast('บันทึกข้อมูลปฏิทินกลางเรียบร้อยแล้ว','success')}catch(err){showError(err)}finally{showLoader(false)}
+  }
+
+  async function confirmDeleteCentral(rowNumber){const c=state.central.find(x=>Number(x.rowNumber)===Number(rowNumber));const result=await Swal.fire({title:'ยืนยันการลบข้อมูล?',text:c?.title||c?.type||'',icon:'warning',showCancelButton:true,confirmButtonText:'ลบข้อมูล',cancelButtonText:'ยกเลิก',confirmButtonColor:'#B4233E'});if(!result.isConfirmed)return;showLoader(true);try{const res=await callServer('deleteCentralItem',state.adminToken,rowNumber);ensureSuccess(res);await refreshAll(false);toast('ลบข้อมูลเรียบร้อยแล้ว','success')}catch(err){showError(err)}finally{showLoader(false)}}
+
+  function setImportSource(type){
+    document.getElementById('import-source-type').value=type;
+    applyImportPreset();
+  }
+
+  function applyImportPreset(updateUrl=true){
+    const type=document.getElementById('import-source-type')?.value||'buddhist';
+    ['buddhist','holiday','lunar'].forEach(v=>document.getElementById('preset-'+v)?.classList.toggle('active',v===type));
+    const urlMap={buddhist:state.settings.MYHORA_BUDDHIST_URL||'https://myhora.com/calendar/ical/buddha.aspx?latest.ics=',holiday:state.settings.MYHORA_HOLIDAY_URL||'https://myhora.com/calendar/ical/holiday.aspx?latest.ics=',lunar:state.settings.MYHORA_LUNAR_URL||'https://myhora.com/calendar/ical/thai.aspx?latest.ics='};
+    if(updateUrl!==false&&urlMap[type])document.getElementById('import-url').value=urlMap[type];
+    if(type==='holiday')document.getElementById('import-mark-holiday').checked=true;
+    if(type==='lunar'||type==='buddhist')document.getElementById('import-mark-holiday').checked=false;
+    resetImportPreview(false);
+    safeLucide();
+  }
+
+  function toggleImportMethod(){
+    const method=document.getElementById('import-method').value;
+    document.getElementById('import-url-group').classList.toggle('hidden',method!=='url');
+    document.getElementById('import-file-group').classList.toggle('hidden',method!=='file');
+  }
+
+  async function analyzeIcsImport(){
+    const sourceType=document.getElementById('import-source-type').value;
+    const buddhistYear=Number(document.getElementById('import-year').value||0);
+    if(!buddhistYear||buddhistYear<2500||buddhistYear>2700){toast('กรุณาระบุปี พ.ศ. ให้ถูกต้อง','warning');return}
+    const options={sourceType,buddhistYear,convertThaiDigits:document.getElementById('import-convert-digits').checked,markHoliday:document.getElementById('import-mark-holiday').checked};
+    const method=document.getElementById('import-method').value;
+    setButtonLoading('analyze-import-btn',true,'กำลังตรวจสอบ...');
+    try{
+      let res;
+      if(method==='url'){
+        const url=document.getElementById('import-url').value.trim();
+        if(!url)throw new Error('กรุณาระบุ URL ไฟล์ ICS');
+        res=await callServer('previewIcsFromUrl',state.adminToken,url,options);
+      }else{
+        const file=document.getElementById('import-file').files[0];
+        if(!file)throw new Error('กรุณาเลือกไฟล์ ICS');
+        if(file.size>5*1024*1024)throw new Error('ไฟล์มีขนาดเกิน 5 MB');
+        const base64=await readFileBase64(file);
+        res=await callServer('previewIcsFile',state.adminToken,{name:file.name,mimeType:file.type||'text/calendar',base64},options);
+      }
+      ensureSuccess(res);
+      state.importPreview={meta:res.meta||{},stats:res.stats||{},items:(res.items||[]).map(item=>({...item,selected:item.selected!==false}))};
+      renderImportPreview();
+      toast('ตรวจสอบไฟล์เรียบร้อย พบ '+state.importPreview.items.length+' รายการ','success');
+    }catch(err){showError(err)}finally{setButtonLoading('analyze-import-btn',false,'<i data-lucide="scan-search"></i>ตรวจสอบข้อมูล');safeLucide()}
+  }
+
+  function renderImportPreview(){
+    const preview=state.importPreview,items=preview.items||[],meta=preview.meta||{};
+    const selected=items.filter(x=>x.selected).length,newItems=items.filter(x=>x.duplicateStatus==='ใหม่').length,duplicates=items.length-newItems;
+    document.getElementById('import-preview').classList.toggle('hidden',!items.length);
+    if(!items.length)return;
+    document.getElementById('import-source-meta').innerHTML=`<strong>${escapeHtml(meta.calendarName||meta.sourceLabel||'ปฏิทิน MyHora')}</strong> · ปี พ.ศ. ${escapeHtml(meta.buddhistYear||'')} · อ่านได้ ${escapeHtml(meta.totalEventsInFile||items.length)} รายการ · เลือกเฉพาะปีนี้ ${escapeHtml(meta.matchedEvents||items.length)} รายการ${meta.sourceUrl||meta.sourceName?`<br><span>${escapeHtml(meta.sourceUrl||meta.sourceName)}</span>`:''}`;
+    document.getElementById('import-stats').innerHTML=`<div class="import-stat"><div class="number">${items.length}</div><div class="label">รายการที่พบ</div></div><div class="import-stat"><div class="number">${newItems}</div><div class="label">รายการใหม่</div></div><div class="import-stat"><div class="number">${duplicates}</div><div class="label">รายการซ้ำ/อาจซ้ำ</div></div><div class="import-stat"><div class="number">${selected}</div><div class="label">เลือกนำเข้า</div></div>`;
+    document.getElementById('import-select-all').checked=selected===items.length;
+    document.getElementById('import-select-all').indeterminate=selected>0&&selected<items.length;
+    document.getElementById('import-preview-body').innerHTML=items.map((item,index)=>{const statusClass=item.duplicateStatus==='ใหม่'?'duplicate-new':item.duplicateStatus==='มีอยู่แล้ว'?'duplicate-old':'duplicate-maybe';return `<tr><td><input class="preview-check" type="checkbox" ${item.selected?'checked':''} onchange="toggleImportItem(${index},this.checked)"></td><td>${escapeHtml(formatThaiDate(item.date))}</td><td>${escapeHtml(item.lunar||'-')}</td><td><span class="type-badge" style="background:${escapeAttr(item.color||'#694497')}18;color:${escapeAttr(item.color||'#694497')}">${escapeHtml(item.type||'-')}</span></td><td><strong>${escapeHtml(item.title||'(ข้อมูลจันทรคติ)')}</strong>${item.note?`<div style="font-size:11px;color:var(--muted);margin-top:3px">${escapeHtml(item.note)}</div>`:''}</td><td><span class="${statusClass}">${escapeHtml(item.duplicateStatus||'ใหม่')}</span></td></tr>`}).join('');
+    safeLucide();
+  }
+
+  function toggleImportItem(index,checked){if(state.importPreview.items[index])state.importPreview.items[index].selected=checked;renderImportPreview()}
+  function toggleAllImportItems(checked){state.importPreview.items.forEach(item=>item.selected=checked);renderImportPreview()}
+
+  function resetImportPreview(clearFile=true){
+    state.importPreview={meta:null,stats:null,items:[]};
+    const preview=document.getElementById('import-preview');if(preview)preview.classList.add('hidden');
+    if(clearFile&&document.getElementById('import-file'))document.getElementById('import-file').value='';
+  }
+
+  async function commitImportPreview(){
+    const items=state.importPreview.items.filter(item=>item.selected);
+    if(!items.length){toast('กรุณาเลือกรายการอย่างน้อย 1 รายการ','warning');return}
+    const strategy=document.getElementById('import-strategy').value;
+    const confirm=await Swal.fire({title:'ยืนยันนำเข้าปฏิทิน?',html:`เลือกนำเข้า <strong>${items.length}</strong> รายการ<br>${strategy==='update'?'รายการเดิมจาก MyHora จะถูกอัปเดต':'รายการเดิมจะถูกข้าม'}`,icon:'question',showCancelButton:true,confirmButtonText:'ยืนยันนำเข้า',cancelButtonText:'ยกเลิก',confirmButtonColor:'#8F1D54'});
+    if(!confirm.isConfirmed)return;
+    setButtonLoading('commit-import-btn',true,'กำลังนำเข้า...');
+    try{
+      const res=await callServer('commitIcsImport',state.adminToken,{items,strategy,meta:state.importPreview.meta||{}});
+      ensureSuccess(res);
+      await refreshAll(false);
+      resetImportPreview();
+      await loadImportHistory();
+      Swal.fire({title:'นำเข้าสำเร็จ',html:`เพิ่มใหม่ <strong>${res.added}</strong> · อัปเดต <strong>${res.updated}</strong> · ข้าม <strong>${res.skipped}</strong>${res.conflicts?` · ข้อขัดแย้ง <strong>${res.conflicts}</strong>`:''}<br><small>รหัสชุดนำเข้า ${escapeHtml(res.batchId)}</small>`,icon:'success',confirmButtonColor:'#8F1D54'});
+    }catch(err){showError(err)}finally{setButtonLoading('commit-import-btn',false,'<i data-lucide="database-zap"></i>ยืนยันนำเข้า');safeLucide()}
+  }
+
+  async function loadImportHistory(){
+    if(!state.adminToken)return;
+    try{
+      const res=await callServer('getImportHistory',state.adminToken,100);ensureSuccess(res);state.importHistory=res.history||[];
+      document.getElementById('import-history-body').innerHTML=state.importHistory.length?state.importHistory.map(h=>`<tr><td>${escapeHtml(h.dateTime||'-')}</td><td><code>${escapeHtml(h.batchId||'-')}</code></td><td>${escapeHtml(importTypeThai(h.sourceType))}</td><td>${escapeHtml(h.buddhistYear||'-')}</td><td>${escapeHtml(h.added||'0')}</td><td>${escapeHtml(h.updated||'0')}</td><td>${escapeHtml(h.skipped||'0')}</td><td><span class="history-status ${h.status==='ย้อนกลับแล้ว'?'rolled':''}">${escapeHtml(h.status||'-')}</span></td><td>${h.status==='ย้อนกลับแล้ว'?'<span style="color:var(--muted);font-size:12px">ย้อนกลับแล้ว</span>':`<button class="btn btn-danger btn-sm" onclick="rollbackImportBatch('${escapeAttr(h.batchId)}')"><i data-lucide="undo-2"></i>ย้อนกลับ</button>`}</td></tr>`).join(''):'<tr><td colspan="9" class="empty-state">ยังไม่มีประวัติการนำเข้า</td></tr>';
+      safeLucide();
+    }catch(err){showError(err)}
+  }
+
+  async function rollbackImportBatch(batchId){
+    const confirm=await Swal.fire({title:'ย้อนกลับชุดนำเข้านี้?',text:'ระบบจะลบรายการที่เพิ่มใหม่และคืนค่ารายการที่ถูกอัปเดต',icon:'warning',showCancelButton:true,confirmButtonText:'ยืนยันย้อนกลับ',cancelButtonText:'ยกเลิก',confirmButtonColor:'#B4233E'});if(!confirm.isConfirmed)return;
+    showLoader(true);try{const res=await callServer('rollbackIcsImport',state.adminToken,batchId);ensureSuccess(res);await refreshAll(false);await loadImportHistory();toast('ย้อนกลับข้อมูลเรียบร้อยแล้ว','success')}catch(err){showError(err)}finally{showLoader(false)}
+  }
+
+  function importTypeThai(type){return ({buddhist:'วันพระ',holiday:'วันหยุด',lunar:'จันทรคติไทย',auto:'ตรวจอัตโนมัติ'})[type]||type||'-'}
+
+  function renderSettingsForm(){
+    const fields=[['SYSTEM_NAME','ชื่อระบบ'],['UNIVERSITY_NAME','ชื่อมหาวิทยาลัย'],['ORGANIZATION','ชื่อหน่วยงาน'],['LOCATION','สถานที่ตั้ง'],['ACADEMIC_YEAR','ปีการศึกษา'],['LOGO_URL','URL โลโก้'],['WEBSITE','เว็บไซต์'],['CONTACT_PHONE','โทรศัพท์'],['DEVELOPER','ผู้พัฒนาระบบ'],['DEVELOPER_POSITION','ตำแหน่งผู้พัฒนา'],['THEME_PRIMARY','สีชมพูหลัก'],['THEME_SECONDARY','สีม่วง'],['THEME_GOLD','สีทอง'],['THEME_BACKGROUND','สีพื้นหลัง'],['MYHORA_BUDDHIST_URL','URL MyHora วันพระ'],['MYHORA_HOLIDAY_URL','URL MyHora วันหยุด'],['MYHORA_LUNAR_URL','URL MyHora จันทรคติ']];
+    document.getElementById('settings-form').innerHTML=fields.map(([key,label])=>`<div class="form-group ${['UNIVERSITY_NAME','ORGANIZATION','LOCATION','LOGO_URL','MYHORA_BUDDHIST_URL','MYHORA_HOLIDAY_URL','MYHORA_LUNAR_URL'].includes(key)?'full':''}"><label class="form-label">${label}</label><input class="form-control setting-input" data-key="${key}" value="${escapeAttr(state.settings[key]??'')}"></div>`).join('')+`<div class="form-group full"><label class="form-label">การแสดงผลข้อมูลปฏิทิน</label><div style="display:flex;gap:18px;flex-wrap:wrap;background:white;border:1px solid var(--line);padding:14px;border-radius:12px"><label><input type="checkbox" class="setting-check" data-key="SHOW_LUNAR" ${asBool(state.settings.SHOW_LUNAR,true)?'checked':''}> แสดงจันทรคติ</label><label><input type="checkbox" class="setting-check" data-key="SHOW_BUDDHIST_DAY" ${asBool(state.settings.SHOW_BUDDHIST_DAY,true)?'checked':''}> แสดงวันพระ</label><label><input type="checkbox" class="setting-check" data-key="SHOW_HOLIDAY" ${asBool(state.settings.SHOW_HOLIDAY,true)?'checked':''}> แสดงวันหยุด</label></div></div>`;
+  }
+  async function saveSettingsFromPage(){const updates={};document.querySelectorAll('.setting-input').forEach(el=>updates[el.dataset.key]=el.value);document.querySelectorAll('.setting-check').forEach(el=>updates[el.dataset.key]=el.checked);showLoader(true);try{const res=await callServer('saveSettings',state.adminToken,updates);ensureSuccess(res);state.settings=res.settings;applySettings();renderAll();toast('บันทึกการตั้งค่าเรียบร้อยแล้ว','success')}catch(err){showError(err)}finally{showLoader(false)}}
+
+  async function loadLogs(){if(!state.adminToken)return;try{const res=await callServer('getSystemLogs',state.adminToken,200);ensureSuccess(res);const rows=res.logs||[];document.getElementById('logs-body').innerHTML=rows.length?rows.map(r=>`<tr>${r.map(x=>`<td>${escapeHtml(x||'-')}</td>`).join('')}</tr>`).join(''):'<tr><td colspan="6" class="empty-state">ยังไม่มีบันทึกการใช้งาน</td></tr>'}catch(err){showError(err)}}
+
+  function openPasswordModal(){['old-password','new-password','confirm-password'].forEach(id=>document.getElementById(id).value='');openModal('password-modal')}
+  async function submitPasswordChange(){const oldP=document.getElementById('old-password').value,newP=document.getElementById('new-password').value,confirmP=document.getElementById('confirm-password').value;if(newP.length<8){toast('รหัสผ่านใหม่ต้องมีอย่างน้อย 8 ตัวอักษร','warning');return}if(newP!==confirmP){toast('ยืนยันรหัสผ่านใหม่ไม่ตรงกัน','warning');return}showLoader(true);try{const res=await callServer('changeAdminPassword',state.adminToken,oldP,newP);ensureSuccess(res);closeModal('password-modal');toast('เปลี่ยนรหัสผ่านเรียบร้อยแล้ว','success')}catch(err){showError(err)}finally{showLoader(false)}}
+
+  function openModal(id){document.getElementById(id).classList.remove('hidden');document.body.style.overflow='hidden';safeLucide()}
+  function closeModal(id){document.getElementById(id).classList.add('hidden');if(!document.querySelector('.modal:not(.hidden)'))document.body.style.overflow=''}
+  function backdropClose(e,id){if(e.target.id===id)closeModal(id)}
+  function setSelectValue(id,value){const el=document.getElementById(id);if([...el.options].some(o=>o.value===value))el.value=value}
+  function readFileBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)})}
+  function showLoader(show){const el=document.getElementById('loader');if(el)el.classList.toggle('hidden',!show)}
+  function setButtonLoading(id,loading,html){const btn=document.getElementById(id);btn.disabled=loading;btn.innerHTML=loading?'<span class="spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span>'+html:html}
+  function ensureSuccess(res){if(!res||res.status!=='success')throw new Error(res?.message||'เกิดข้อผิดพลาดจากระบบ')}
+  function showError(err){
+    console.error(err);
+    const message=err?.message||String(err||'เกิดข้อผิดพลาด');
+    if(window.Swal&&typeof window.Swal.fire==='function'){
+      Swal.fire({title:'เกิดข้อผิดพลาด',text:message,icon:'error',confirmButtonColor:'#8F1D54'});
+    }else{
+      window.alert('เกิดข้อผิดพลาด: '+message);
+    }
+  }
+  function toast(title,icon='success'){
+    if(window.Swal&&typeof window.Swal.fire==='function'){
+      Swal.fire({toast:true,position:'top-end',showConfirmButton:false,timer:2600,timerProgressBar:true,icon,title,background:'#FFFDF8',color:'#3E3540'});
+    }else{
+      console.log(title);
+    }
+  }
+  function asBool(value,fallback=false){if(value===true||value===1)return true;if(value===false||value===0)return false;if(value==null||value==='')return fallback;return ['true','1','yes','ใช่'].includes(String(value).toLowerCase())}
+  function toKey(date){const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,'0'),d=String(date.getDate()).padStart(2,'0');return `${y}-${m}-${d}`}
+  function parseKey(key){const [y,m,d]=String(key).split('-').map(Number);return new Date(y,m-1,d)}
+  function formatThaiDate(key){if(!key)return '-';const d=parseKey(key);return `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()+543}`}
+  function formatRange(start,end){if(!start)return '-';return start===end||!end?formatThaiDate(start):formatThaiDate(start)+' – '+formatThaiDate(end)}
+  function escapeHtml(value){return String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[ch]))}
+  function escapeAttr(value){return escapeHtml(value).replace(/`/g,'&#096;')}
+</script>
+</body>
+</html>
